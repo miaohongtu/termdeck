@@ -2,6 +2,10 @@
 
 一个能保存并恢复开发现场的桌面终端管理器。
 
+[下载最新版 Termdeck](https://github.com/miaohongtu/termdeck/releases/latest)
+
+目前提供 Apple Silicon（M1/M2/M3/M4）版本。应用尚未经过 Apple 签名和公证，首次打开时 macOS 可能显示安全提示。
+
 ![Termdeck 工作区预览](docs/assets/termdeck-workspace.png)
 
 ## MVP

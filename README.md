@@ -19,3 +19,18 @@
 npm install
 npm run dev
 ```
+
+## 打包
+
+```bash
+# 当前 Apple Silicon Mac：生成 DMG 和 ZIP
+npm run dist
+
+# Intel Mac
+npm run dist:x64
+
+# 同时生成两种架构
+npm run dist:all
+```
+
+产物位于 `release/`。未配置 Apple Developer ID 时会生成未签名安装包，适合本机测试；公开分发需要额外配置签名与公证。

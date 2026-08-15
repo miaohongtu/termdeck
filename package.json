@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build && tsc -p electron/tsconfig.json",
     "start": "electron .",
     "typecheck": "tsc -b --pretty false",
-    "test": "node --experimental-strip-types --test src/layout.test.ts src/snap.test.ts src/resizeFrame.test.ts src/terminalBehavior.test.ts src/imeGuard.test.ts",
+    "test": "node --experimental-strip-types --test src/layout.test.ts src/snap.test.ts src/resizeFrame.test.ts src/terminalBehavior.test.ts src/imeGuard.test.ts src/workspaceRenderPlan.test.ts",
     "icon": "bash scripts/generate-mac-icon.sh",
     "dist": "npm run icon && npm run build && electron-builder --mac --arm64",
     "dist:x64": "npm run icon && npm run build && electron-builder --mac --x64",

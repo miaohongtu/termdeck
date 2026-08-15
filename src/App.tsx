@@ -5,6 +5,7 @@ import type { Frame, TerminalSpec, Workspace } from "./types";
 import { magnetizeAxis, type MagnetLock } from "./snap";
 import { resizeFrameWithMagnet, type ResizeEdge } from "./resizeFrame";
 import { isRelativeFrame, toPercentStyle, toPixelFrame, toRelativeFrame, type Viewport } from "./layout";
+import { createWorkspaceRenderPlan } from "./workspaceRenderPlan";
 
 const defaultFrame = (index: number): Frame => ({
   x: 0.018 + (index % 3) * 0.026,
@@ -104,7 +105,7 @@ export default function App() {
   }); }, []);
   useEffect(() => { if (ready) window.termdeck.save(spaces); }, [spaces, ready]);
   const current = spaces.find(space => space.id === active);
-  const updateTerminal = (id: string, frame: Frame) => setSpaces(value => value.map(space => space.id === active ? { ...space, terminals: space.terminals.map(term => term.id === id ? { ...term, frame: toRelativeFrame(frame, viewport) } : term) } : space));
+  const updateTerminal = (spaceId: string, id: string, frame: Frame) => setSpaces(value => value.map(space => space.id === spaceId ? { ...space, terminals: space.terminals.map(term => term.id === id ? { ...term, frame: toRelativeFrame(frame, viewport) } : term) } : space));
   const focus = (id: string) => setFront(value => [...value.filter(item => item !== id), id]);
   const addWorkspace = () => {
     const item: Workspace = { id: uuid(), name: `工作区 ${spaces.length + 1}`, terminals: [] };
@@ -118,12 +119,16 @@ export default function App() {
     setSpaces(value => value.map(space => space.id === active ? { ...space, terminals: [...space.terminals, terminal] } : space));
     focus(terminal.id);
   };
-  const removeTerminal = (id: string) => setSpaces(value => value.map(space => space.id === active ? { ...space, terminals: space.terminals.filter(term => term.id !== id) } : space));
+  const removeTerminal = (spaceId: string, id: string) => setSpaces(value => value.map(space => space.id === spaceId ? { ...space, terminals: space.terminals.filter(term => term.id !== id) } : space));
   if (!ready) return <div className="loading" />;
   return (
     <main className="canvas">
       <div className="window-drag-region" />
-      {current?.terminals.map((terminal, index) => <TerminalTile key={terminal.id} spec={terminal} index={index} viewport={viewport} otherFrames={current.terminals.filter(item => item.id !== terminal.id).map((item, otherIndex) => toPixelFrame(item.frame ?? defaultFrame(otherIndex), viewport))} onFrame={frame => updateTerminal(terminal.id, frame)} onRemove={() => removeTerminal(terminal.id)} onFocus={() => focus(terminal.id)} zIndex={10 + front.indexOf(terminal.id)} />)}
+      {createWorkspaceRenderPlan(spaces, active).map(layer => (
+        <section key={layer.id} className={`workspace-layer ${layer.active ? "active" : ""}`} aria-hidden={!layer.active}>
+          {layer.terminals.map((terminal, index) => <TerminalTile key={terminal.id} spec={terminal} index={index} viewport={viewport} otherFrames={layer.terminals.filter(item => item.id !== terminal.id).map((item, otherIndex) => toPixelFrame(item.frame ?? defaultFrame(otherIndex), viewport))} onFrame={frame => updateTerminal(layer.id, terminal.id, frame)} onRemove={() => removeTerminal(layer.id, terminal.id)} onFocus={() => focus(terminal.id)} zIndex={10 + front.indexOf(terminal.id)} />)}
+        </section>
+      ))}
       {current?.terminals.length === 0 && <button className="first-terminal" onClick={addTerminal}><b>＋</b><span>新建终端</span></button>}
       <nav className="workspace-dock">
         {spaces.map(space => <button key={space.id} className={space.id === active ? "active" : ""} onClick={() => setActive(space.id)}>{space.name}</button>)}

@@ -2,6 +2,8 @@
 
 一个能保存并恢复开发现场的桌面终端管理器。
 
+![Termdeck 工作区预览](docs/assets/termdeck-workspace.png)
+
 ## MVP
 
 - 工作区自动持久化
